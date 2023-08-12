@@ -1,9 +1,25 @@
-# This file is executed on every boot (including wake-boot from deepsleep)
-#import esp
-#esp.osdebug(None)
-#import webrepl
-#webrepl.start()
-from connections import WiFiManager, Bluetooth
-Bluetooth("Micro ACS").connected()
-print(WiFiManager.getList())
-WiFiManager.connect("RotBraido", "rotmi210")
+from time import sleep
+from connections import WiFiManager, BluetoothManager
+
+blue = BluetoothManager("ACS #9181")
+
+while True:
+    msg = blue.write()
+    if msg == "list-wifi":
+        for i in WiFiManager.getList():
+            blue.send(str(i))
+    elif msg == "connect-wifi":
+        blue.send("SSID: ", end="")
+        ssid = blue.write()
+        blue.send("Password: ", end="")
+        password = blue.write()
+        if WiFiManager.connect(ssid, password):
+            blue.send("Connected")
+        else:
+            blue.send("Failed")
+    elif msg == "disconnect-wifi":
+        WiFiManager.disconnect()
+        blue.send("Disconnected")
+    elif msg == "exit":
+        blue.send("Bye")
+        break
