@@ -1,25 +1,35 @@
+import sys
 from time import sleep
 from connections import WiFiManager, BluetoothManager
+from entities import command
 
 blue = BluetoothManager("ACS #9181")
 
+commands = command.Command()
+    
+commands.add(
+    "list-wifi",
+    lambda: list(map(lambda e: blue.send(str(e)), WiFiManager.getList()))
+)
+commands.add(
+        "connect-wifi",
+        lambda: 
+            blue.send("connected to wifi") 
+            if WiFiManager.connect([blue.send("SSID: ", end=""), blue.write()][1], [blue.send("Password: ", end=""), blue.write()][1])
+            else blue.send("failed to connect to wifi")
+    )
+commands.add(
+    "disconnect-wifi",
+    lambda: [WiFiManager.disconnect(), blue.send("disconnected from wifi")]
+)
+commands.add(
+    "exit",
+    lambda: [blue.send("Bye"), sys.exit()]
+)
+
 while True:
     msg = blue.write()
-    if msg == "list-wifi":
-        for i in WiFiManager.getList():
-            blue.send(str(i))
-    elif msg == "connect-wifi":
-        blue.send("SSID: ", end="")
-        ssid = blue.write()
-        blue.send("Password: ", end="")
-        password = blue.write()
-        if WiFiManager.connect(ssid, password):
-            blue.send("Connected")
-        else:
-            blue.send("Failed")
-    elif msg == "disconnect-wifi":
-        WiFiManager.disconnect()
-        blue.send("Disconnected")
-    elif msg == "exit":
-        blue.send("Bye")
-        break
+    try:
+        commands.get(msg)()
+    except Exception as e:
+        print(e)
