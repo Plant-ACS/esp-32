@@ -35,6 +35,7 @@ class WiFiManager:
             print("connect", end="")
             for _ in range(20):
                 if WiFiManager.wifi.isconnected():
+                    print("\nconnected")
                     return True
                 print(".", end="")
                 sleep(1)
@@ -42,6 +43,8 @@ class WiFiManager:
     
     @staticmethod
     def disconnect() -> None:
+        if WiFiManager.wifi.isconnected():
+            raise Exception("wifi is not connected")
         WiFiManager.wifi.disconnect()
         WiFiManager.wifi.active(False)
         print("disconnecting wifi")
