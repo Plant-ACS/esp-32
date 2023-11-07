@@ -23,6 +23,7 @@ class Sensor:
          raise Exception("Ports 25 and 26 are Digital-to-Analog Converters, choose another port")
       self._min = min
       self._max = max
+      self.pin = port
       self._pin = ADC(Pin(port))
       self._pin.width(ADC.WIDTH_10BIT)
 
@@ -53,17 +54,17 @@ class Sensor:
        return value * (self._max - self._min) + self._min
    
    def getPort(self):
-      return self.port
+      return self.pin
        
 class LDR(Sensor):
-   def __init__(self, sensor: Sensor = None, port: int = None, min: int = 0, max: int = 10):
+   def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
       if (sensor != None):
          super().__init__(sensor.port, sensor.min, sensor.max)
       else:
          super().__init__(port, min, max)
 
 class Moisture(Sensor):
-   def __init__(self, sensor: Sensor = None, port: int = None, min: int = 0, max: int = 10):
+   def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
       if sensor != None:
          super().__init__(sensor.port, sensor.min, sensor.max)
       else:
