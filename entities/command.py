@@ -5,7 +5,7 @@ class Command:
   
   def add(self, name: str, command: callable):
     if name in self.__commandNames:
-      raise Exception("the command exist")
+      raise Exception("the command already exists")
     
     self.__commandNames.append(name)
     self.__commandFunctions.append(command)
@@ -14,7 +14,7 @@ class Command:
     try:    
       return self.__commandFunctions[self.__commandNames.index(name)]
     except:
-      raise Exception("the command is not exist")
+      raise Exception("the command does not exist")
   
   def remove(self, name: str) -> bool:
     try:
