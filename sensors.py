@@ -19,6 +19,8 @@ class Sensor:
          raise Exception('Min value is greater or equal to max value')
       if self.isSensorConnectedIn(port) == False:
          raise Exception(f"Sensor is not connected in port: {port}")
+      if (port == 26 or port == 25):
+         raise Exception("Ports 25 and 26 are Digital-to-Analog Converters, choose another port")
       self._min = min
       self._max = max
       self._pin = ADC(Pin(port))
@@ -50,8 +52,20 @@ class Sensor:
        if(value < 0): value *= -1
        return value * (self._max - self._min) + self._min
        
-class LCD(Sensor):
-   pass
+class LDR(Sensor):
+   def __init__(self, sensor: Sensor = None, port: int = None, min: int = 0, max: int = 10):
+      if (sensor != None):
+         self.port = sensor.port
+         self.min = sensor.min
+         self.max = sensor.max
+      else:
+         super().__init__(port, min, max)
 
-class Humidity(Sensor):
-   pass
+class Moisture(Sensor):
+   def __init__(self, sensor: Sensor = None, port: int = None, min: int = 0, max: int = 10):
+      if (sensor != None):
+         self.port = sensor.port
+         self.min = sensor.min
+         self.max = sensor.max
+      else:
+         super().__init__(port, min, max)
