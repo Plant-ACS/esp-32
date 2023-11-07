@@ -14,7 +14,7 @@ class Relay:
       self.setValue(0)
 
 class Sensor:
-   def __init__(self, port: int, min: int = 0, max: int = 10, kind: str = "sensor"):
+   def __init__(self, port: int, min: int = 0, max: int = 10):
       if max <= 0:
          raise Exception('Min value is greater or equal to max value')
       if self.isSensorConnectedIn(port) == False:
@@ -25,7 +25,6 @@ class Sensor:
       self._max = max
       self._pin = ADC(Pin(port))
       self._pin.width(ADC.WIDTH_10BIT)
-      self.kind = kind
 
    @staticmethod
    def isSensorConnectedIn(pin: int) -> bool:
@@ -55,20 +54,17 @@ class Sensor:
    
    def getPort(self):
       return self.port
-   
-   def getKind(self): 
-      return self.kind
        
 class LDR(Sensor):
    def __init__(self, sensor: Sensor = None, port: int = None, min: int = 0, max: int = 10):
       if (sensor != None):
-         super().__init__(sensor.port, sensor.min, sensor.max, "ldr-sensor")
+         super().__init__(sensor.port, sensor.min, sensor.max)
       else:
-         super().__init__(port, min, max, "ldr-sensor")
+         super().__init__(port, min, max)
 
 class Moisture(Sensor):
    def __init__(self, sensor: Sensor = None, port: int = None, min: int = 0, max: int = 10):
       if sensor != None:
-         super().__init__(sensor.port, sensor.min, sensor.max, "moisture-sensor")
+         super().__init__(sensor.port, sensor.min, sensor.max)
       else:
-         super().__init__(port, min, max, "moisture-sensor")
+         super().__init__(port, min, max)

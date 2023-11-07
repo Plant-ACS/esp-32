@@ -45,7 +45,7 @@ commands.add(
 commands.add(
     "list-sensors",
     lambda: 
-        list(map(lambda s: blue.send(str([s.getType(), s.getPort()])), sensorsConnected))
+        list(map(lambda s: blue.send(str([type(s), s.getPort()])), sensorsConnected))
         if len(sensorsConnected) != 0
         else blue.send("no sensors added so far")
 )
