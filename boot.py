@@ -31,7 +31,7 @@ commands.add(
     "add-sensor",
     lambda: 
         sensorsConnected.append(LDR(commands.get("create-sensor"))) 
-        if [blue.send("Sensor type (ldr, moisture): "), blue.write()][1] 
+        if [blue.send("Sensor type (ldr, moisture): "), blue.write()][1] == "ldr" 
         else sensorsConnected.append(Moisture(commands.get("create-sensor")))
 )
 commands.add(
@@ -44,7 +44,10 @@ commands.add(
 )
 commands.add(
     "list-sensors",
-    lambda: list(map(lambda s: blue.send(str([s.getType(), s.getPort()])), sensorsConnected))
+    lambda: 
+        list(map(lambda s: blue.send(str([s.getType(), s.getPort()])), sensorsConnected))
+        if len(sensorsConnected) != 0
+        else blue.send("no sensors added so far")
 )
 
 while True:
