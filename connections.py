@@ -101,11 +101,21 @@ class BluetoothManager():
     def send(self, data: str, end="\n") -> None:
         self.__ble.gatts_notify(0, self.__tx, data + end)
 
-    def write(self) -> str:
+    def read(self) -> str:
         msg = self.__ble_msg
         while msg == "": msg = self.__ble_msg
         self.__ble_msg = ""
         return msg
+    
+    def filterInt(self):
+        msg = self.__ble_msg
+        while not msg.isdigit(): 
+            if msg == "n": 
+                self.__ble_msg = ""
+                return None
+            msg = self.__ble_msg
+        self.__ble_msg = ""
+        return int(msg)
 
     def __advertiser(self):
         name = bytes(self.__name, 'UTF-8')
