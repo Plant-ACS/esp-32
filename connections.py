@@ -113,6 +113,11 @@ class BluetoothManager():
         self.__ble_msg = ""
         return msg
 
+    # read msg once and don't clear it (accessible many times)
+    def peek(self):
+        return self.__ble_msg
+
+
     def filterInt(self) -> int:
         msg = self.__ble_msg
         while not msg.isdigit(): msg = self.__ble_msg 
