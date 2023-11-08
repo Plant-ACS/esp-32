@@ -1,11 +1,14 @@
 import sys
 from time import sleep
 from connections import WiFiManager, BluetoothManager
-from entities import command
+from entities import command, communicate
 from sensors import Relay, Sensor, LDR, Moisture 
+ 
 blue = BluetoothManager("ACS #9181")
 
-sensorsConnected = []
+sensorsConnected = [
+    LDR(27, 0, 1000)
+]
 commands = command.Command()
 
 commands.add(
@@ -30,10 +33,19 @@ commands.add(
 commands.add(
     "add-sensor",
     lambda: 
-        sensorsConnected.append(LDR(sensor = commands.get("create-sensor")())) 
+        sensorsConnected.append(LDR(communicate.Communicate.jsonToStr(blue.peek())["port"], 
+                                    communicate.Communicate.jsonToStr(blue.peek())["min"],
+                                    communicate.Communicate.jsonToStr(blue.peek())["max"])) 
         if [blue.send("Sensor type (ldr, moisture): "), blue.readOnly(["ldr", "moisture"])][1] == "ldr" 
         else sensorsConnected.append(Moisture(sensor = commands.get("create-sensor")()))
 )
+# commands.add(
+#     "add-sensor",
+#     lambda: 
+#         sensorsConnected.append(LDR(sensor = commands.get("create-sensor")())) 
+#         if [blue.send("Sensor type (ldr, moisture): "), blue.readOnly(["ldr", "moisture"])][1] == "ldr" 
+#         else sensorsConnected.append(Moisture(sensor = commands.get("create-sensor")()))
+# )
 commands.add(
     "create-sensor",
     lambda: 
@@ -45,7 +57,7 @@ commands.add(
 commands.add(
     "list-sensors",
     lambda: 
-        list(map(lambda s: blue.send(str([type(s), s.getPort()])), sensorsConnected))
+        list(map(lambda s: blue.send(str([type(s), s.port, s.value()])), sensorsConnected))
         if len(sensorsConnected) != 0
         else blue.send("no sensors added so far")
 )
@@ -56,3 +68,7 @@ while True:
         commands.get(msg)()
     except Exception as e:
         print(e)
+
+# OPT 1
+# receive messages in json format from chat
+# transform messages to create classes
