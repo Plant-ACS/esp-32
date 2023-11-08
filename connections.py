@@ -109,14 +109,21 @@ class BluetoothManager():
     
     def filterInt(self):
         msg = self.__ble_msg
-        while not msg.isdigit(): 
-            if msg == "n": 
-                self.__ble_msg = ""
-                return None
-            msg = self.__ble_msg
+        while not msg.isdigit(): msg = self.__ble_msg 
         self.__ble_msg = ""
         return int(msg)
 
+    def filterInt(self, optional: str):
+        msg = self.__ble_msg
+        while not msg.isdigit(): 
+            if msg == optional: 
+                msg = self.__ble_msg
+                self.__ble_msg = ""
+                return None
+            msg = self.__ble_msg 
+        self.__ble_msg = ""
+        return int(msg)
+    
     def __advertiser(self):
         name = bytes(self.__name, 'UTF-8')
         adv_data = bytearray(b'\x02\x01\x02') + bytearray((len(name) + 1, 0x09)) + name
