@@ -15,6 +15,9 @@ class Relay:
 
 class Sensor:
    def __init__(self, port: int, min: int = 0, max: int = 10):
+      if min == None: min = 0
+      if max == None: max = 10
+
       if max <= 0:
          raise Exception('Min value is greater or equal to max value')
       if self.isSensorConnectedIn(port) == False:
