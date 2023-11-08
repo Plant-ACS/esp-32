@@ -107,13 +107,19 @@ class BluetoothManager():
         self.__ble_msg = ""
         return msg
     
-    def filterInt(self):
+    def readOnly(self, options: list[str]) -> str:
+        msg = self.__ble_msg
+        while msg not in options: msg = self.__ble_msg
+        self.__ble_msg = ""
+        return msg
+
+    def filterInt(self) -> int:
         msg = self.__ble_msg
         while not msg.isdigit(): msg = self.__ble_msg 
         self.__ble_msg = ""
         return int(msg)
 
-    def filterInt(self, optional: str):
+    def filterIntOptional(self, optional: str):
         msg = self.__ble_msg
         while not msg.isdigit(): 
             if msg == optional: 

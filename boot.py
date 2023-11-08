@@ -31,15 +31,15 @@ commands.add(
     "add-sensor",
     lambda: 
         sensorsConnected.append(LDR(sensor = commands.get("create-sensor")())) 
-        if [blue.send("Sensor type (ldr, moisture): "), blue.read()][1] == "ldr" 
+        if [blue.send("Sensor type (ldr, moisture): "), blue.readOnly(["ldr", "moisture"])][1] == "ldr" 
         else sensorsConnected.append(Moisture(sensor = commands.get("create-sensor")()))
 )
 commands.add(
     "create-sensor",
     lambda: 
         Sensor([blue.send("Port: ", end=""), blue.filterInt()][1], 
-        [blue.send("Minimum value (optional: 'n'): ", end=""), blue.filterInt("n")][1],
-        [blue.send("Maximum value (optional: 'n'): ", end=""), blue.filterInt("n")][1]
+        [blue.send("Minimum value (optional: 'n'): ", end=""), blue.filterIntOptional("n")][1],
+        [blue.send("Maximum value (optional: 'n'): ", end=""), blue.filterIntOptional("n")][1]
         )
 )
 commands.add(
@@ -54,7 +54,5 @@ while True:
     msg = blue.read()
     try:
         commands.get(msg)()
-        blue.send(("len: " + str(len(sensorsConnected))))
-        list(map(lambda s: blue.send(str([type(s), s.getPort()])), sensorsConnected))
     except Exception as e:
         print(e)
