@@ -16,7 +16,7 @@ commands.add(
     "connect-wifi",
     lambda: 
         blue.send("connected to wifi") 
-        if WiFiManager.connect([blue.send("SSID: ", end=""), blue.write()][1], [blue.send("Password: ", end=""), blue.write()][1])
+        if WiFiManager.connect([blue.send("SSID: ", end=""), blue.read()][1], [blue.send("Password: ", end=""), blue.read()][1])
         else blue.send("failed to connect to wifi")
 )
 commands.add(
@@ -25,21 +25,21 @@ commands.add(
 )
 commands.add(
     "exit",
-    lambda: [blue.send("Bye"), sys.exit()]
+    lambda: [blue.send("Bye!"), sys.exit()]
 )
 commands.add(
     "add-sensor",
     lambda: 
-        sensorsConnected.append(LDR(commands.get("create-sensor"))) 
-        if [blue.send("Sensor type (ldr, moisture): "), blue.write()][1] == "ldr" 
-        else sensorsConnected.append(Moisture(commands.get("create-sensor")))
+        sensorsConnected.append(LDR(sensor = commands.get("create-sensor")())) 
+        if [blue.send("Sensor type (ldr, moisture): "), blue.read()][1] == "ldr" 
+        else sensorsConnected.append(Moisture(sensor = commands.get("create-sensor")()))
 )
 commands.add(
     "create-sensor",
     lambda: 
-        Sensor([blue.send("Port: ", end=""), blue.write()][1], 
-        [blue.send("Minimum value (optional): ", end=""), blue.write()][1]
-        [blue.send("Maximum value (optional): ", end=""), blue.write()][1]
+        Sensor([blue.send("Port: ", end=""), blue.read()][1], 
+        [blue.send("Minimum value (optional): ", end=""), blue.read()][1],
+        [blue.send("Maximum value (optional): ", end=""), blue.read()][1]
         )
 )
 commands.add(
@@ -51,8 +51,10 @@ commands.add(
 )
 
 while True:
-    msg = blue.write()
+    msg = blue.read()
     try:
         commands.get(msg)()
+        blue.send(("len: " + str(len(sensorsConnected))))
+        list(map(lambda s: blue.send(str([type(s), s.getPort()])), sensorsConnected))
     except Exception as e:
         print(e)
