@@ -37,9 +37,9 @@ commands.add(
 commands.add(
     "create-sensor",
     lambda: 
-        Sensor([blue.send("Port: ", end=""), blue.read()][1], 
-        [blue.send("Minimum value (optional): ", end=""), blue.read()][1],
-        [blue.send("Maximum value (optional): ", end=""), blue.read()][1]
+        Sensor([blue.send("Port: ", end=""), blue.filterInt()][1], 
+        [blue.send("Minimum value (optional: 'n'): ", end=""), blue.filterInt("n")][1],
+        [blue.send("Maximum value (optional: 'n'): ", end=""), blue.filterInt("n")][1]
         )
 )
 commands.add(
