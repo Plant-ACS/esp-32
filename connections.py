@@ -84,19 +84,24 @@ class BluetoothManager():
             buffer = self.__ble.gatts_read(self.__rx)
             self.__ble_msg = buffer.decode('UTF-8').strip()
             
-    def __register(self):        
-        # Nordic UART Service (NUS)
+    def __register(self):
         NUS_UUID = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E'
         RX_UUID = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E'
         TX_UUID = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E'
-            
+
         BLE_NUS = ubluetooth.UUID(NUS_UUID)
+        
         BLE_RX = (ubluetooth.UUID(RX_UUID), ubluetooth.FLAG_WRITE)
         BLE_TX = (ubluetooth.UUID(TX_UUID), ubluetooth.FLAG_NOTIFY)
-            
+
         BLE_UART = (BLE_NUS, (BLE_TX, BLE_RX,))
         SERVICES = (BLE_UART, )
         ((self.__tx, self.__rx,), ) = self.__ble.gatts_register_services(SERVICES)
+
+    def __advertiser(self):
+        name = bytes(self.__name, 'UTF-8')
+        adv_data = bytearray(b'\x02\x01\x02') + bytearray((len(name) + 1, 0x09)) + name
+        self.__ble.gap_advertise(100, adv_data)
 
     def send(self, data: str, end="\n") -> None:
         self.__ble.gatts_notify(0, self.__tx, data + end)
@@ -113,10 +118,20 @@ class BluetoothManager():
         self.__ble_msg = ""
         return msg
 
-    # read msg once and don't clear it (accessible many times)
-    def peek(self):
-        return self.__ble_msg
-
+    def peek(self, first: bool = False, last: bool = False):
+        if not first and not last: return self.__ble_msg 
+        msg = self.__ble_msg
+        if not first and last:
+            self.__ble_msg = ""
+            return msg
+        if first and not last:
+            while msg == "": msg = self.__ble_msg
+            return msg
+        if first and last:
+            while msg == "": msg = self.__ble_msg
+            self.__ble_msg = ""
+            return msg
+            
 
     def filterInt(self) -> int:
         msg = self.__ble_msg
@@ -135,7 +150,4 @@ class BluetoothManager():
         self.__ble_msg = ""
         return int(msg)
     
-    def __advertiser(self):
-        name = bytes(self.__name, 'UTF-8')
-        adv_data = bytearray(b'\x02\x01\x02') + bytearray((len(name) + 1, 0x09)) + name
-        self.__ble.gap_advertise(100, adv_data)
+    
