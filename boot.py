@@ -6,8 +6,10 @@ from sensors import Relay, Sensor, LDR, Moisture
  
 blue = BluetoothManager("ACS #9181")
 
+dict = communicate.Communicate.strToJson('{"port": 27, "min": 0, "max": 1000}')
+
 sensorsConnected = [
-    LDR(27, 0, 1000)
+    # LDR(dict["port"], dict["min"], dict["max"])
 ]
 commands = command.Command()
 
@@ -32,12 +34,14 @@ commands.add(
 )
 commands.add(
     "add-sensor",
-    lambda: 
-        sensorsConnected.append(LDR(communicate.Communicate.jsonToStr(blue.peek())["port"], 
-                                    communicate.Communicate.jsonToStr(blue.peek())["min"],
-                                    communicate.Communicate.jsonToStr(blue.peek())["max"])) 
-        if [blue.send("Sensor type (ldr, moisture): "), blue.readOnly(["ldr", "moisture"])][1] == "ldr" 
-        else sensorsConnected.append(Moisture(sensor = commands.get("create-sensor")()))
+    lambda:
+        sensorsConnected.append(LDR(
+                                    [blue.send("Type in json: "), 
+                                     communicate.Communicate.strToJson(blue.peek(True))["port"]][1],
+                                     communicate.Communicate.strToJson(blue.peek(False, True))["min"],
+                                     100
+                                    #  communicate.Communicate.strToJson(blue.peek(False, True))
+                                ))
 )
 # commands.add(
 #     "add-sensor",
@@ -68,7 +72,3 @@ while True:
         commands.get(msg)()
     except Exception as e:
         print(e)
-
-# OPT 1
-# receive messages in json format from chat
-# transform messages to create classes

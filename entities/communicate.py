@@ -1,9 +1,9 @@
 import json
 class Communicate: 
     @staticmethod
-    def strToJson(self, jsonStr):
+    def strToJson(jsonStr):
         return json.loads(jsonStr)
 
     @staticmethod
-    def jsonToStr(self, jsonDict):
+    def jsonToStr(jsonDict):
         return json.dumps(jsonDict)
