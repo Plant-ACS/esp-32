@@ -23,7 +23,7 @@ class Sensor:
       if (port == 26 or port == 25):
          raise Exception("Ports 25 and 26 are Digital-to-Analog Converters, choose another port")
       if self.isSensorConnectedIn(port) == False:
-         raise Exception(f"Sensor is not connected in port: {port}")
+         raise Exception(f"Sensor is not connected to port: {port}")
       self._min = min
       self._max = max
       self.port = port
@@ -36,13 +36,13 @@ class Sensor:
       values = []
       for i in range(100):
          values.append(analog.read())
-         sleep(0.05)
       print(values)
-      media = sum(values) / len(values)
-      gap = 60
+      average = sum(values) / len(values)
+      gap = 100
 
       for value in values:
-         if value > media +gap or value < media -gap:
+         if value > average +gap or value < average -gap:
+            print("average: " + str(average) + "\nvalue exceeded: " + str(value))
             return False
       return True
    
@@ -53,7 +53,7 @@ class Sensor:
       return value / 100
 
    def value(self) -> float:
-       value = (self.read() / 1023 -1)
+       value = (self.read() / 4095 -1)
        if(value < 0): value *= -1
        return value * (self._max - self._min) + self._min
        
