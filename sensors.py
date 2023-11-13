@@ -36,13 +36,12 @@ class Sensor:
       values = []
       for i in range(100):
          values.append(analog.read())
-      print(values)
-      average = sum(values) / len(values)
-      gap = 100
+         sleep(0.05)
+      
+      media = sum(values) / len(values)
 
-      for value in values:
-         if value > average +gap or value < average -gap:
-            print("average: " + str(average) + "\nvalue exceeded: " + str(value))
+      for el in values:
+         if el > media +60 or el < media -60:
             return False
       return True
    
@@ -53,9 +52,10 @@ class Sensor:
       return value / 100
 
    def value(self) -> float:
-       value = (self.read() / 4095 -1)
+       value = (self.read() / 1023 -1)
        if(value < 0): value *= -1
        return value * (self._max - self._min) + self._min
+   
        
 class LDR(Sensor):
    def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
