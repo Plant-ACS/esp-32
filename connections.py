@@ -112,11 +112,20 @@ class BluetoothManager():
         self.__ble_msg = ""
         return msg
     
-    def readOnly(self, options: list[str]) -> str:
+    def read_only(self, options: list[str]) -> str:
         msg = self.__ble_msg
         while msg not in options: msg = self.__ble_msg
         self.__ble_msg = ""
         return msg
+
+    def read_until_find(self, stop: str):
+        stored_msg = ""
+        while not stop in stored_msg: 
+            print(stored_msg)
+            stored_msg += self.read()
+
+        self.__ble_msg = ""
+        return stored_msg
 
     def peek(self, first: bool = False, last: bool = False):
         if not first and not last: return self.__ble_msg 
