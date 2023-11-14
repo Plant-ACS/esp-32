@@ -6,12 +6,16 @@ from sensors import Relay, Sensor, LDR, Moisture
  
 blue = BluetoothManager("ACS #9181")
 
-dict = communicate.Communicate.strToJson('{"port": 27, "min": 0, "max": 1000}')
+dict = communicate.Communicate.str_to_json('{"port": 27, "min": 0, "max": 1000}')
 
-sensorsConnected = [
+sensors_connected = [
     # LDR(dict["port"], dict["min"], dict["max"])
 ]
+
+current_json = []
+
 commands = command.Command()
+private_commands = command.Command()
 
 commands.add(
     "list-wifi",
@@ -32,43 +36,55 @@ commands.add(
     "exit",
     lambda: [blue.send("Bye!"), sys.exit()]
 )
+private_commands.add(
+    "get-json",
+    lambda:
+        current_json.append(communicate.Communicate.str_to_json(blue.read_until_find("}")))
+)
+private_commands.add(
+    "clear-json",
+    lambda:
+        current_json.pop()
+)
 commands.add(
     "add-sensor",
-    lambda:
-        sensorsConnected.append(LDR(
-                                    [blue.send("Type in json: "), 
-                                     communicate.Communicate.strToJson(blue.peek(True))["port"]][1],
-                                     communicate.Communicate.strToJson(blue.peek(False, True))["min"],
-                                     100
-                                    #  communicate.Communicate.strToJson(blue.peek(False, True))
-                                ))
+    lambda: 
+        sensors_connected.append(LDR(sensor = commands.get("create-sensor")())) 
+        if [blue.send("Sensor type (ldr, moisture): "), blue.read_only(["ldr", "moisture"])][1] == "ldr" 
+        else sensors_connected.append(Moisture(sensor = commands.get("create-sensor")()))
 )
-# commands.add(
-#     "add-sensor",
-#     lambda: 
-#         sensorsConnected.append(LDR(sensor = commands.get("create-sensor")())) 
-#         if [blue.send("Sensor type (ldr, moisture): "), blue.readOnly(["ldr", "moisture"])][1] == "ldr" 
-#         else sensorsConnected.append(Moisture(sensor = commands.get("create-sensor")()))
-# )
-commands.add(
+private_commands.add(
     "create-sensor",
     lambda: 
-        Sensor([blue.send("Port: ", end=""), blue.filterInt()][1], 
-        [blue.send("Minimum value (optional: 'n'): ", end=""), blue.filterIntOptional("n")][1],
-        [blue.send("Maximum value (optional: 'n'): ", end=""), blue.filterIntOptional("n")][1]
-        )
+        Sensor(current_json[0]["port"], 
+               current_json[0]["min"], 
+               current_json[0]["max"])
 )
+# private_commands.add(
+#     "create-sensor",
+#     lambda: 
+#         Sensor([blue.send("Port: ", end=""), blue.filterInt()][1], 
+#         [blue.send("Minimum value (optional: 'n'): ", end=""), blue.filterIntOptional("n")][1],
+#         [blue.send("Maximum value (optional: 'n'): ", end=""), blue.filterIntOptional("n")][1]
+#         )
+# )
 commands.add(
     "list-sensors",
     lambda: 
-        list(map(lambda s: blue.send(str([type(s), s.port, s.value()])), sensorsConnected))
-        if len(sensorsConnected) != 0
+        list(map(lambda s: blue.send(str([type(s), s.port, s.value()])), sensors_connected))
+        if len(sensors_connected) != 0
         else blue.send("no sensors added so far")
 )
 
 while True:
     msg = blue.read()
     try:
-        commands.get(msg)()
+        if msg == "add-sensor":
+            private_commands.get("get-json")()
+            commands.get(msg)()
+            private_commands.get("clear-json")()
+        else: 
+            commands.get(msg)()
+            
     except Exception as e:
         print(e)
