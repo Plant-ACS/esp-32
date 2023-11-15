@@ -49,18 +49,23 @@ class WiFiManager:
         WiFiManager.wifi.active(False)
         print("disconnecting wifi")
 class BluetoothManager():
+    instance = None
     def __init__(self, name):
-        self.__led = Pin(13, Pin.OUT)
-        self.__timer1 = Timer(0)
-        self.__ble_msg = ""
-        
-        self.__name = name
-        self.__ble = ubluetooth.BLE()
-        self.__ble.active(True)
-        self.__disconnected()
-        self.__ble.irq(self.__ble_irq)
-        self.__register()
-        self.__advertiser()
+        if(BluetoothManager.instance != None):
+            return BluetoothManager.instance
+        else:
+            self.__led = Pin(13, Pin.OUT)
+            self.__timer1 = Timer(0)
+            self.__ble_msg = ""
+            
+            self.__name = name
+            self.__ble = ubluetooth.BLE()
+            self.__ble.active(True)
+            self.__disconnected()
+            self.__ble.irq(self.__ble_irq)
+            self.__register()
+            self.__advertiser()
+            BluetoothManager.instance = self
 
     def __connected(self):
         self.__led.value(0)
@@ -73,6 +78,7 @@ class BluetoothManager():
         if event == 1: #_IRQ_CENTRAL_CONNECT:
                        # A central has connected to this peripheral
             self.__connected()
+            
 
         elif event == 2: #_IRQ_CENTRAL_DISCONNECT:
                          # A central has disconnected from this peripheral.
@@ -106,57 +112,32 @@ class BluetoothManager():
     def send(self, data: str, end="\n") -> None:
         self.__ble.gatts_notify(0, self.__tx, data + end)
 
-    def read(self) -> str:
-        msg = self.__ble_msg
-        while msg == "": msg = self.__ble_msg
-        self.__ble_msg = ""
-        return msg
-    
     def read_only(self, options: list[str]) -> str:
         msg = self.__ble_msg
         while msg not in options: msg = self.__ble_msg
         self.__ble_msg = ""
         return msg
-
-    def read_until_find(self, stop: str):
+    
+    def read_all(self) -> str:
+        msg = self.__ble_msg
+        while msg == "": msg = self.__ble_msg
+        self.__ble_msg = ""
+        return msg
+    
+    def read_until_find(self, stop: str, amount: int = 1):
         stored_msg = ""
-        while not stop in stored_msg: 
-            print(stored_msg)
-            stored_msg += self.read()
-
+        detected = 0
+        while detected < amount:
+            while not stop in stored_msg: 
+                stored_msg += self.read_all()
+            detected += 1
+            
         self.__ble_msg = ""
         return stored_msg
-
-    def peek(self, first: bool = False, last: bool = False):
-        if not first and not last: return self.__ble_msg 
-        msg = self.__ble_msg
-        if not first and last:
-            self.__ble_msg = ""
-            return msg
-        if first and not last:
-            while msg == "": msg = self.__ble_msg
-            return msg
-        if first and last:
-            while msg == "": msg = self.__ble_msg
-            self.__ble_msg = ""
-            return msg
-            
-
-    def filterInt(self) -> int:
-        msg = self.__ble_msg
-        while not msg.isdigit(): msg = self.__ble_msg 
-        self.__ble_msg = ""
-        return int(msg)
-
-    def filterIntOptional(self, optional: str):
-        msg = self.__ble_msg
-        while not msg.isdigit(): 
-            if msg == optional: 
-                msg = self.__ble_msg
-                self.__ble_msg = ""
-                return None
-            msg = self.__ble_msg 
-        self.__ble_msg = ""
-        return int(msg)
     
+    def read(self) -> str:
+        msg = self.read_until_find("}", 2)
+        if (msg[0] != "{" or msg[-1] != "}"):
+            raise Exception("invalid json")
+        return msg
     
