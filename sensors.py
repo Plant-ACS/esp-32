@@ -1,18 +1,6 @@
 from machine import ADC, Pin
 from time import sleep
 
-class Relay:
-   def __init__(self, port: int):
-      self._pin = Pin(port, Pin.OUT)
-     
-   def setValue(self, on: bool):
-      self._pin.value(on)
-
-   def onIn(self, time: int):
-      self.setValue(1)
-      sleep(time)
-      self.setValue(0)
-
 class Sensor:
    def __init__(self, port: int, min: int = 0, max: int = 100):
       if min == None: min = 0
@@ -26,9 +14,21 @@ class Sensor:
          raise Exception(f"Sensor is not connected to port: {port}")
       self._min = min
       self._max = max
-      self.port = port
+      self._port = port
       self._pin = ADC(Pin(self.port))
       self._pin.width(ADC.WIDTH_10BIT)
+
+   @property
+   def port(self) -> int:
+      return self._port
+
+   @property
+   def min(self) -> int:
+      return self._min
+      
+   @property
+   def max(self) -> int:
+      return self._max
 
    @staticmethod
    def isSensorConnectedIn(pin: int) -> bool:
