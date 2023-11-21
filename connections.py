@@ -3,6 +3,7 @@ import network
 from machine import Pin
 from machine import Timer
 from time import sleep
+from entities import communicate
 
 class WiFiManager:
     wifi = network.WLAN(network.STA_IF)
@@ -48,30 +49,32 @@ class WiFiManager:
         WiFiManager.wifi.disconnect()
         WiFiManager.wifi.active(False)
         print("disconnecting wifi")
+
 class BluetoothManager():
-    instance = None
     def __init__(self, name):
-        if(BluetoothManager.instance != None):
-            return BluetoothManager.instance
-        else:
-            self.__led = Pin(13, Pin.OUT)
-            self.__timer1 = Timer(0)
-            self.__ble_msg = ""
-            
-            self.__name = name
-            self.__ble = ubluetooth.BLE()
-            self.__ble.active(True)
-            self.__disconnected()
-            self.__ble.irq(self.__ble_irq)
-            self.__register()
-            self.__advertiser()
-            BluetoothManager.instance = self
+        self.__led = Pin(13, Pin.OUT)
+        self.__timer1 = Timer(0)
+        self.__ble_msg = ""
+        
+        self.__name = name
+        self.__ble = ubluetooth.BLE()
+        self.__ble.active(True)
+        self.__disconnected()
+        self.__ble.irq(self.__ble_irq)
+        self.__register()
+        self.__advertiser()
+        self.__is_connected = False
+
+    def isConnected(self) -> bool:
+        return self.__is_connected
 
     def __connected(self):
+        self.__is_connected = True
         self.__led.value(0)
         self.__timer1.deinit()
 
     def __disconnected(self):        
+        self.__is_connected = False
         self.__timer1.init(period=100, mode=Timer.PERIODIC, callback=lambda t: self.__led.value(3))
 
     def __ble_irq(self, event, _data):      
@@ -109,8 +112,11 @@ class BluetoothManager():
         adv_data = bytearray(b'\x02\x01\x02') + bytearray((len(name) + 1, 0x09)) + name
         self.__ble.gap_advertise(100, adv_data)
 
-    def send(self, data: str, end="\n") -> None:
-        self.__ble.gatts_notify(0, self.__tx, data + end)
+    def send(self, data: str) -> None:
+        self.__ble.gatts_notify(0, self.__tx, data)
+
+    def sendJson(self, data: dict) -> None:
+        self.send(communicate.Communicate.json_to_str(data))
 
     def read_only(self, options: list[str]) -> str:
         msg = self.__ble_msg
@@ -141,3 +147,11 @@ class BluetoothManager():
             raise Exception("invalid json")
         return msg
     
+instanceBLE = None
+def createBluetoothManager(name: str) -> None:
+    global instanceBLE
+    instanceBLE = BluetoothManager(name)
+
+def getBluetoothManager() -> BluetoothManager:
+    global instanceBLE
+    return instanceBLE

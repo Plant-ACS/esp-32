@@ -1,8 +1,9 @@
 from connections import BluetoothManager
-from sensors import Relay, Sensor, LDR, Moisture 
-from memoryController import MemoryController
+from sensors import Sensor, LDR, Moisture 
+from modules import Relay
+from controller import memoryController
 
-blue = BluetoothManager()
+blue = BluetoothManager("ACS #9181")
 
 class SensorsController:
     @staticmethod
@@ -12,14 +13,14 @@ class SensorsController:
                         max = jsonDict["max"])
 
         if (jsonDict["type"] == "ldr"):
-            MemoryController.addSensor(LDR(sensor = sensor))
+            memoryController.MemoryController.addSensor(LDR(sensor = sensor))
             
         elif (jsonDict["type"] == "moisture"):
-            MemoryController.addSensor(Moisture(sensor = sensor))
+            memoryController.MemoryController.addSensor(Moisture(sensor = sensor))
 
         else:
             raise Exception("Invalid sensor type")
         
     @staticmethod
     def remove(port: str):
-        MemoryController.removeSensor(port)
+        memoryController.MemoryController.removeSensor(port)

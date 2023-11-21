@@ -1,4 +1,4 @@
-from memoryController import MemoryController
+from controller import memoryController
 
 class ModuleController:
     @staticmethod
@@ -7,4 +7,4 @@ class ModuleController:
 
     @staticmethod
     def remove(port: int):
-        MemoryController.removeModule(port)
+        memoryController.MemoryController.removeModule(port)

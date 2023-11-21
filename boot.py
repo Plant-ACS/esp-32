@@ -31,30 +31,15 @@ commands.add(
 commands.add(
     "add-sensor",
     lambda:
-        sensorsController.add(
+        sensorsController.SensorsController.add(
             [blue.send("Type JSON: "), 
              communicate.Communicate.str_to_json(blue.read_until_find("}"))][1])
 )
 commands.add(
     "remove-sensor",
     lambda:
-        sensorsController.remove(
+        sensorsController.SensorsController.remove(
             [blue.send("Port: "), communicate.Communicate.str_to_json(blue.read_until_find("}"))["port"]][1]
-        )
-)
-commands.add(
-    "add-module",
-    lambda:
-        modulesController.add(
-            [blue.send("Type JSON: "), 
-             communicate.Communicate.str_to_json(blue.read_until_find("}"))][1])
-)
-commands.add(
-    "remove-sensor",
-    lambda:
-        modulesController.remove(
-            [blue.send("Port: "), 
-             communicate.Communicate.str_to_json(blue.read_until_find("}"))["port"]][1]
         )
 )
 commands.add(
@@ -63,17 +48,34 @@ commands.add(
         memoryController.MemoryController.listSensors()
 )
 commands.add(
+    "add-module",
+    lambda:
+        modulesController.ModuleController.add(
+            [blue.send("Type JSON: "), 
+             communicate.Communicate.str_to_json(blue.read_until_find("}"))][1])
+)
+commands.add(
+    "remove-module",
+    lambda:
+        modulesController.ModuleController.remove(
+            [blue.send("Port: "), 
+             communicate.Communicate.str_to_json(blue.read_until_find("}"))["port"]][1]
+        )
+)
+commands.add(
     "list-modules",
     lambda:
         memoryController.MemoryController.listModules()
 )
 
+invite = False
+
 while True:
-    try:
-        msg = blue.read()
-        print(msg)
-        msg = communicate.Communicate.str_to_json(msg)
-        commands.get(msg["name"])()
-        
-    except Exception as e:
-        print(e)
+    while not blue.isConnected():
+        try:
+            msg = blue.read()
+            msg = communicate.Communicate.str_to_json(msg)
+            commands.get(msg["name"])()
+            
+        except Exception as e:
+            print(e)

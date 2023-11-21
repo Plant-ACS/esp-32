@@ -5,5 +5,5 @@ class Communicate:
         return json.loads(json_str)
 
     @staticmethod
-    def json_to_str(json_dict):
+    def json_to_str(json_dict: dict):
         return json.dumps(json_dict)
