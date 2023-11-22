@@ -64,6 +64,13 @@ class LDR(Sensor):
       else:
          super().__init__(port, min, max)
 
+class Temperature(Sensor):
+   def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
+      if sensor != None:
+         super().__init__(sensor.port, sensor.min, sensor.max)
+      else:
+         super().__init__(port, min, max)
+
 class Moisture(Sensor):
    def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
       if sensor != None:

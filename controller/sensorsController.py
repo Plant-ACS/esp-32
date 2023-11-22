@@ -1,5 +1,5 @@
 from connections import BluetoothManager
-from sensors import Sensor, LDR, Moisture 
+from sensors import Sensor, LDR, Moisture, Temperature
 from modules import Relay
 from controller import memoryController
 
@@ -17,6 +17,9 @@ class SensorsController:
             
         elif (jsonDict["type"] == "moisture"):
             memoryController.MemoryController.addSensor(Moisture(sensor = sensor))
+
+        elif (jsonDict["type"] == "temperature"):
+            memoryController.MemoryController.addSensor(Temperature(sensor = sensor))
 
         else:
             raise Exception("Invalid sensor type")

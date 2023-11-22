@@ -2,7 +2,9 @@ from time import sleep
 from machine import ADC, Pin
 
 class Module:
-   pass
+   def __init__(self, port: int):
+      self._port = port
+   
 
 class Relay(Module):
    def __init__(self, port: int):
