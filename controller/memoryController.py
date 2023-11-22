@@ -35,13 +35,17 @@ class MemoryController:
     
     @staticmethod
     def listModules():
-        if (MemoryController.__modules == []):
+        if (len(MemoryController.__modules) == 0):
             return "no modules have been added so far"
-        return list(map(lambda module: str([type(module), module.port, module.value()]), MemoryController.__modules))
+        return_list = []
+        list(map(lambda module: return_list.append(str([type(module), module.port, module.value()])), MemoryController.__modules))
+        return return_list
 
     @staticmethod
     def addSensor(sensor):
+        print("adding sensor")
         MemoryController.__sensors.append(sensor)
+        print(MemoryController.__sensors)
 
     @staticmethod
     def getSensors():
@@ -72,6 +76,8 @@ class MemoryController:
     
     @staticmethod
     def listSensors():
-        if (MemoryController.__sensors == []):
+        if (len(MemoryController.__sensors) == 0):
             return "no sensors have been added so far"
-        return list(map(lambda sensor: str([type(sensor), sensor.port, sensor.value()]), MemoryController.__sensors))
+        return_list = []
+        list(map(lambda sensor: return_list.append(str([type(sensor), sensor.port, sensor.value()])), MemoryController.__sensors))
+        return return_list
