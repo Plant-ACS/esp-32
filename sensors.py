@@ -38,6 +38,7 @@ class Sensor:
          values.append(analog.read())
          sleep(0.05)
       
+      print(values)
       media = sum(values) / len(values)
 
       for el in values:
@@ -60,20 +61,34 @@ class Sensor:
 class LDR(Sensor):
    def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
       if (sensor != None):
-         super().__init__(sensor.port, sensor.min, sensor.max)
+         print("Created LDR based on another sensor")
+         self._min = sensor.min
+         self._max = sensor.max
+         self._port = sensor.port
+         self._pin = ADC(Pin(self.port))
+         self._pin.width(ADC.WIDTH_10BIT)
       else:
+         print("Creating LDR based on new values")
          super().__init__(port, min, max)
 
 class Temperature(Sensor):
    def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
       if sensor != None:
-         super().__init__(sensor.port, sensor.min, sensor.max)
+         self._min = sensor.min
+         self._max = sensor.max
+         self._port = sensor.port
+         self._pin = ADC(Pin(self.port))
+         self._pin.width(ADC.WIDTH_10BIT)
       else:
          super().__init__(port, min, max)
 
 class Moisture(Sensor):
    def __init__(self, port: int = None, min: int = 0, max: int = 10, sensor: Sensor = None):
       if sensor != None:
-         super().__init__(sensor.port, sensor.min, sensor.max)
+         self._min = sensor.min
+         self._max = sensor.max
+         self._port = sensor.port
+         self._pin = ADC(Pin(self.port))
+         self._pin.width(ADC.WIDTH_10BIT)
       else:
          super().__init__(port, min, max)
