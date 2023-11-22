@@ -8,7 +8,7 @@ blue = BluetoothManager("ACS #9181")
 class SensorsController:
     @staticmethod
     def add(jsonDict: dict):
-        sensor = Sensor(port = jsonDict[0]["port"], 
+        sensor = Sensor(port = jsonDict["port"], 
                         min = jsonDict["min"], 
                         max = jsonDict["max"])
 
