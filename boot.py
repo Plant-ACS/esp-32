@@ -45,7 +45,7 @@ commands.add(
 commands.add(
     "list-sensors",
     lambda: 
-        memoryController.MemoryController.listSensors()
+        blue.send(memoryController.MemoryController.listModules())
 )
 commands.add(
     "add-module",
@@ -71,11 +71,11 @@ commands.add(
 invite = False
 
 while True:
-    while not blue.isConnected():
-        try:
-            msg = blue.read()
-            msg = communicate.Communicate.str_to_json(msg)
-            commands.get(msg["name"])()
-            
-        except Exception as e:
-            print(e)
+    # while not blue.isConnected():
+    try:
+        msg = blue.read()
+        msg = communicate.Communicate.str_to_json(msg)
+        commands.get(msg["name"])()
+        
+    except Exception as e:
+        print(e)
