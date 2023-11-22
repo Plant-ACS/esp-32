@@ -45,7 +45,8 @@ commands.add(
 commands.add(
     "list-sensors",
     lambda: 
-        blue.send(memoryController.MemoryController.listModules())
+        list((map(lambda element: blue.send(str(element) + "\n"), (memoryController.MemoryController.listSensors())))
+    )
 )
 commands.add(
     "add-module",

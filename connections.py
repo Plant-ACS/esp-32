@@ -72,6 +72,7 @@ class BluetoothManager():
         self.__is_connected = True
         self.__led.value(0)
         self.__timer1.deinit()
+        print("BLE connected into device")
 
     def __disconnected(self):        
         self.__is_connected = False
@@ -128,6 +129,7 @@ class BluetoothManager():
         msg = self.__ble_msg
         while msg == "": msg = self.__ble_msg
         self.__ble_msg = ""
+        print(msg)
         return msg
     
     def read_until_find(self, stop: str, amount: int = 1):
