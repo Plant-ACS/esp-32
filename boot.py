@@ -1,6 +1,6 @@
 import sys
 from connections import WiFiManager, BluetoothManager
-from entities import command, communicate
+from entities import command, communicate, action
 from controller import sensorsController, modulesController, memoryController
 
 blue = BluetoothManager("ACS #9181")
@@ -67,6 +67,14 @@ commands.add(
     "list-modules",
     lambda:
         memoryController.MemoryController.listModules()
+)
+def irrigate():
+    blue.send("Irrigating...")
+
+action_irrigate = action.Action("irrigate", irrigate, "Irrigate the plants")
+commands.add(
+    "trigger",
+    lambda: action_irrigate.effect()
 )
 
 invite = False

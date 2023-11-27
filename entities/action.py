@@ -16,11 +16,15 @@ class Action:
     def description(self):
         return self._description
     
+    @name.setter
+    def name(self, name: str):
+        self._name = name
+
+    @description.setter
+    def description(self, description: str):
+        self._description = description
+
     @effect.setter
     def effect(self, effect: callable):
         self._effect = effect
-
-class Irrigate(Action):
-    def __init__(self, name: str, effect: callable, description: str = ""):
-        super().__init__(name, effect, description)
     
