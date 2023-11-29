@@ -2,6 +2,7 @@ import sys
 from connections import WiFiManager, BluetoothManager
 from entities import command, communicate, action
 from controller import sensorsController, modulesController, memoryController
+from modules import Relay
 
 blue = BluetoothManager("ACS #9181")
 
@@ -68,13 +69,24 @@ commands.add(
     lambda:
         memoryController.MemoryController.listModules()
 )
-def irrigate():
-    blue.send("Irrigating...")
+def turnRelayOn(relay: Relay, time_in_seconds: float):
+    relay.onIn(time_in_seconds)
 
-action_irrigate = action.Action("irrigate", irrigate, "Irrigate the plants")
+def irrigate(relay: Relay, time_in_seconds: float):
+    water_flow_ml_by_ms = 100/1500 # full kitchen faucet flow example 
+    turnRelayOn(relay, time_in_seconds)
+
+    return water_flow_ml_by_ms * (time_in_seconds*1000)
+
+def getTimer():
+    time = 0
+    return time
+
+action_irrigate = action.Action("irrigate", irrigate, "Open solenoide to allow water flow")
+
 commands.add(
     "trigger",
-    lambda: action_irrigate.effect()
+    lambda: action_irrigate.effect(relay = Relay(2), time_in_seconds = getTimer())
 )
 
 invite = False

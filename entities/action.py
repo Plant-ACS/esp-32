@@ -1,5 +1,5 @@
 class Action:
-    def __init__(self, name: str, effect: callable, description: str = ""):
+    def __init__(self, name: str, effect: callable, time_in_seconds: float, description: str = ""):
         self._name = name
         self._effect = effect
         self._description = description

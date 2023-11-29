@@ -14,6 +14,6 @@ class Relay(Module):
       self._pin.value(on)
 
    def onIn(self, time: int):
-      self.setValue(1)
-      sleep(time)
       self.setValue(0)
+      sleep(time)
+      self.setValue(1)
