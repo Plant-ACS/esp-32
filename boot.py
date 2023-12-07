@@ -18,7 +18,7 @@ commands.add(
     "connect-wifi",
     lambda: 
         blue.send("connected to wifi") 
-        if WiFiManager.connect([blue.send("SSID: ", end=""), blue.read()][1], [blue.send("Password: ", end=""), blue.read()][1])
+        if WiFiManager.connect([blue.send("SSID: "), blue.read()][1], [blue.send("Password: "), blue.read()][1])
         else blue.send("failed to connect to wifi")
 )
 commands.add(
