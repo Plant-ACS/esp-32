@@ -27,3 +27,7 @@ class SensorsController:
     @staticmethod
     def remove(port: str):
         memoryController.MemoryController.removeSensor(port)
+
+    @staticmethod
+    def get(port: str):
+        return memoryController.MemoryController.getSensor(port)

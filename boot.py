@@ -86,6 +86,10 @@ def start(relay):
 def end(relay):
     relay.setValue(1)
 
+def getSensor(sensor: dict):
+    ldr = sensorsController.SensorsController.add(sensor)
+    blue.send(str(sensorsController.SensorsController.get(ldr["port"])))
+
 action_irrigate = action.Action("irrigate", irrigate, "Open solenoide to allow water flow")
 
 commands.add(
@@ -99,6 +103,10 @@ commands.add(
 commands.add(
     "end",
     lambda: end(relay = Relay(2))
+)
+commands.add(
+    "get-sensor",
+    lambda: blue.send(str(getSensor({"port": 27, "min": 0, "max": 100, "type": "ldr"})))
 )
 
 
